@@ -41,6 +41,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "motor.h"
+#include "rfid.h"
 
 I2C_HandleTypeDef hi2c2;
 
@@ -65,20 +66,38 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
-
-	motorPinSetup();	
-	motorTest();
 	
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_I2C2_Init();
+ // MX_I2C2_Init();
   MX_SPI2_Init();
- 
+	GPIO_InitTypeDef initStr0 = {GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9,
+															GPIO_MODE_OUTPUT_PP,
+															GPIO_SPEED_FREQ_HIGH,
+															GPIO_NOPULL};
+	HAL_GPIO_Init(GPIOC, &initStr0); // Initialize pins 6 7 8 9
+	
+	TM_MFRC522_Init();
+
+	motorPinSetup();	
+
+//	
+	
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-   
+		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8);
+
+		uint8_t cardid;
+		if (TM_MFRC522_Check(&cardid) == MI_OK) {
+			//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+			motorTest();
+		} 
+		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
+		HAL_Delay(100);
+
   }
 }
 
@@ -209,10 +228,19 @@ static void MX_SPI2_Init(void)
 static void MX_GPIO_Init(void)
 {
 
-  /* GPIO Ports Clock Enable */
+ /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
 
+	// NSS config
+	GPIO_InitTypeDef initStr1;
+	initStr1.Pin = GPIO_PIN_12;
+	initStr1.Mode = GPIO_MODE_OUTPUT_PP;
+	initStr1.Pull = GPIO_PULLUP;
+	HAL_GPIO_Init(GPIOB, &initStr1);
+	// Set state to HIGH initially
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
 }
 
 /* USER CODE BEGIN 4 */
