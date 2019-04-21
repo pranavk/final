@@ -50,7 +50,16 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_hal.h"
 
+typedef enum LoadMode_t {
+	CHA_128,
+	CHB_32,
+	CHB_64
+} LoadMode;
+
+void HX711_Init(LoadMode mode);
 uint32_t HXGetValue(void);
+uint32_t HXGetAvgValue(void);
+void HX711_Tare(void);
 
 #ifdef __cplusplus
 }

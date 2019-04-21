@@ -40,9 +40,14 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+
+#include "stdlib.h"
+
+#include "string.h"
 #include "motor.h"
 #include "rfid.h"
 #include "loadcell.h"
+#include "lcd.h"
 
 I2C_HandleTypeDef hi2c2;
 
@@ -90,17 +95,19 @@ int main(void)
 	
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
- // MX_I2C2_Init();
+  MX_I2C2_Init();
   MX_SPI2_Init();
 	MX_UART3_Init();
 
 	TM_MFRC522_Init();
+	HX711_Init(CHB_32);
 
 	motorPinSetup();	
-
+ if (!lcdInit(&hi2c2, (uint8_t)0x27)) {
+			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
+	 }
 //	
 	
-
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -111,15 +118,18 @@ int main(void)
 		if (TM_MFRC522_Check(&cardid) == MI_OK) {
 			//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
 			motorTest();
-			uint32_t data = HXGetValue();
+			uint32_t data = HXGetAvgValue();
 			int value = (int)data;
 			transmitval(value);
 			transmit('\r');
 			transmit('\n');
+			
+			char *numberstr = (char*)malloc(20);
+			sprintf(numberstr, "%d", value);
+			lcdPrintPrimaryStr(numberstr);
 		} 
 		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
 		HAL_Delay(100);
-
   }
 }
 
