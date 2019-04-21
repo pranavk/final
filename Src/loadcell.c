@@ -34,9 +34,8 @@ uint32_t HXGetValue() {
 }
 
 uint32_t HXGetAvgValue() {
-return HXGetValue();
 	const int times = 5;
-	uint32_t data = 0;
+	uint64_t data = 0;
 	for (int i = 0; i < times; i++) {
 		data += HXGetValue();
 	}
@@ -54,7 +53,7 @@ void HX711_Init(LoadMode mode) {
 		pulsesAfter = 1;
 	} else if (mode == CHB_32) {
 		pulsesAfter = 2;
-	} else if (mode == CHB_64) {
+	} else if (mode == CHA_64) {
 		pulsesAfter = 3;
 	}
 	HXGetValue();

@@ -53,7 +53,7 @@ extern "C" {
 typedef enum LoadMode_t {
 	CHA_128,
 	CHB_32,
-	CHB_64
+	CHA_64
 } LoadMode;
 
 void HX711_Init(LoadMode mode);
