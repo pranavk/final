@@ -123,7 +123,8 @@ int main(void)
 			motorTest();
 			uint32_t data = HXGetAvgValue();
 			int value = (int)data;
-			transmitval(value);
+		`char negative = value < 0;
+		`transmitval(negative ? -value : value, negative);
 			transmit('\r');
 			transmit('\n');
 			

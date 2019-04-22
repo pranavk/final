@@ -34,12 +34,7 @@ uint32_t HXGetValue() {
 }
 
 uint32_t HXGetAvgValue() {
-	const int times = 5;
-	uint64_t data = 0;
-	for (int i = 0; i < times; i++) {
-		data += HXGetValue();
-	}
-	return data/times;
+	return HXGetValue();
 }
 
 // Tare
@@ -56,7 +51,7 @@ void HX711_Init(LoadMode mode) {
 	} else if (mode == CHA_64) {
 		pulsesAfter = 3;
 	}
-	HXGetValue();
+	//HXGetValue();
 
 	HX711_Tare();
 }
