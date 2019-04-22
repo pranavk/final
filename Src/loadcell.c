@@ -34,7 +34,13 @@ uint32_t HXGetValue() {
 }
 
 uint32_t HXGetAvgValue() {
-	return HXGetValue();
+	const int times = 5;
+	uint64_t data = 0;
+	for (int i = 0; i < times; i++) {
+		data += HXGetValue();
+		HAL_Delay(150);
+	}
+	return data/times;
 }
 
 // Tare

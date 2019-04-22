@@ -99,16 +99,12 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C2_Init();
-	HAL_Delay(100);
   MX_SPI2_Init();
-	HAL_Delay(100);
 	MX_UART3_Init();
-	HAL_Delay(100);
+
 	TM_MFRC522_Init();
-	HAL_Delay(100);
 	HX711_Init(CHB_32);
-	HAL_Delay(100);
-	
+
 	motorPinSetup();	
  if (!lcdInit(&hi2c2, (uint8_t)0x27)) {
 			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
@@ -123,11 +119,11 @@ int main(void)
 
 		uint8_t cardid;
 		if (TM_MFRC522_Check(&cardid) == MI_OK) {
-			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+			//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
 			motorTest();
-			int value = HXGetAvgValue();
-			char negative = value < 0;
-			transmitval(negative ? -value : value, negative);
+			uint32_t data = HXGetAvgValue();
+			int value = (int)data;
+			transmitval(value);
 			transmit('\r');
 			transmit('\n');
 			
@@ -136,7 +132,7 @@ int main(void)
 			lcdPrintPrimaryStr(numberstr);
 		} 
 		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
-		HAL_Delay(2000);
+		HAL_Delay(100);
   }
 }
 
@@ -309,19 +305,20 @@ static void MX_GPIO_Init(void)
 	
 	// Load cell configuration
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
-	GPIO_InitStruct.Pin = GPIO_PIN_8;
+	GPIO_InitStruct.Pin = GPIO_PIN_6;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 	
-	GPIO_InitStruct.Pin = GPIO_PIN_9;
+	GPIO_InitStruct.Pin = GPIO_PIN_7;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 	
-	GPIO_InitStruct.Pin = GPIO_PIN_6 | GPIO_PIN_7| GPIO_PIN_8 | GPIO_PIN_9;
+	// Other LEDs; we are using 6 and 7 for load cell
+	GPIO_InitStruct.Pin = GPIO_PIN_8 | GPIO_PIN_9;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
