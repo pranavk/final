@@ -69,14 +69,17 @@ void transmit(char c)
 	USART3->TDR = c;
 }
 
-void transmitval(int val) {
+void transmitval(int val, char negative) {
 	int newval = val / 10;
 	if (newval == 0) {
+		if (negative) {
+			transmit('-');
+		}
 		transmit('0' + val % 10);
 		return;
 	}
 
-	transmitval(val/10);
+	transmitval(val/10, negative);
 	transmit('0' + val % 10);
 }
 
