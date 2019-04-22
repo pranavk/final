@@ -118,7 +118,7 @@ void motorTest(void)
 	//motorStop();
 //	HAL_Delay(1000);
 	motorBackward();
-	HAL_Delay(3000);
-	motorStop();
+	//HAL_Delay(3000);
+	//motorStop();
 }
 

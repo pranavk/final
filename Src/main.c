@@ -83,6 +83,39 @@ void transmitval(int val, char negative) {
 	transmit('0' + val % 10);
 }
 
+void transmitstr(char *str) {
+	int len = strlen(str);
+	for (int i = 0; i < len; i++) {
+		transmit(str[i]);
+	}
+	transmit('\r');
+	transmit('\n');
+}
+
+uint32_t debouncer_cals = 0;
+
+void calorieButton(int foodEaten)
+{
+	debouncer_cals = (debouncer_cals << 1); // Always shift every loop iteration
+	
+	if (GPIOA->IDR & 0x00000001) // If input signal is set/high
+	{ 
+		debouncer_cals |= 0x01; // Set lowest bit of bit-vector
+			// calories calcuation
+		// 100 calories per gram
+		int cals = foodEaten * 100;
+		char *str = (char*)malloc(20);
+		sprintf(str, "Cals: %d", cals);
+		lcdPrintPrimaryStr(str);
+	}
+	if (debouncer_cals == 0xFFFFFFFF) { // If high, do this
+	
+	}
+	
+	if (debouncer_cals == 0x00000000) { // If low, do this
+	}
+}
+
 /**
   * @brief  The application entry point.
   * @retval int
@@ -106,34 +139,57 @@ int main(void)
 	HX711_Init(CHB_32);
 
 	motorPinSetup();	
+	testButtonSetup();
+	
  if (!lcdInit(&hi2c2, (uint8_t)0x27)) {
 			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
 	 }
 //	
-	
+	int max = 0;
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
 		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8);
 
+		uint32_t data = HXGetAvgValue();
+		int value = (int)data;			
+	//	char negative = value < 0;
+	//	transmitval(negative ? -value : value, negative);
+	//	transmit('\r');
+	//	transmit('\n');	
+		
+		int foodEaten = max - value;
+	//	transmitval(foodEaten, 0);
+		calorieButton(foodEaten);
+		//transmit('\r');
+		//transmit('\n');	
+		
 		uint8_t cardid;
 		if (TM_MFRC522_Check(&cardid) == MI_OK) {
-			//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
-			motorTest();
-			uint32_t data = HXGetAvgValue();
-			int value = (int)data;
-		`char negative = value < 0;
-		`transmitval(negative ? -value : value, negative);
-			transmit('\r');
-			transmit('\n');
+			transmitstr("RFID Detected");
 			
-			char *numberstr = (char*)malloc(20);
-			sprintf(numberstr, "%d", value);
-			lcdPrintPrimaryStr(numberstr);
+		
+			while (value < 1000) {
+				transmitstr("Not enough food.");
+				
+				motorForward();
+				HAL_Delay(2000);
+				
+				uint32_t data = HXGetAvgValue();
+				value = (int)data;			
+				char negative = value < 0;
+				transmitval(negative ? -value : value, negative);
+				transmit('\r');
+				transmit('\n');
+			}
+			
+			transmitstr("Enough food! Stopping the motor...");
+			motorStop();
+			max = value;
 		} 
 		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
-		HAL_Delay(100);
+		HAL_Delay(200);
   }
 }
 
