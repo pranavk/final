@@ -5,8 +5,8 @@ static int load_offset = 0;
 
 // Clock is PC6; Data is pC7
 uint32_t HXGetValue() {
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_RESET);
-	while (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_7) == GPIO_PIN_SET) {
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
+	while (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9) == GPIO_PIN_SET) {
 		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8);
 		HAL_Delay(1);
 	}
@@ -14,21 +14,21 @@ uint32_t HXGetValue() {
 	// run the clock
 	uint32_t data = 0;
 	for (int i = 0; i < 24; i++) {
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
 		
 		data = data << 1;
 		
-		if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_7) == GPIO_PIN_SET) {
+		if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9) == GPIO_PIN_SET) {
 			data |= 0x1;
 		}
 		
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
 	}
 	
 	// yes, we want to keep reading from this channel; so, spit out the 25th cycle.
 	for (int i = 0; i < pulsesAfter; i++) {
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
 	}
 	return data - load_offset;
 }
@@ -38,6 +38,7 @@ uint32_t HXGetAvgValue() {
 	uint64_t data = 0;
 	for (int i = 0; i < times; i++) {
 		data += HXGetValue();
+		HAL_Delay(150);
 	}
 	return data/times;
 }
