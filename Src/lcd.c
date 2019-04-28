@@ -1,21 +1,41 @@
 /**
- * Copyright Nikita Bulaev 2017
- *
- * STM32 HAL libriary for LCD display based on HITACHI HD44780U chip.
- *
- * THIS SOFTWARE IS PROVIDED "AS IS"
- * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
- * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
- * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT
- * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+  ******************************************************************************
+  * @file           : motor.h
+  * @brief          : Header for motor.c file.
+  *                   This file contains the common defines of the application.
+  ******************************************************************************
+  ** This notice applies to any and all portions of this file
+  * that are not between comment pairs USER CODE BEGIN and
+  * USER CODE END. Other portions of this file, whether 
+  * inserted by the user or by software development tools
+  * are owned by their respective copyright owners.
+  *
+  * COPYRIGHT(c) 2019 STMicroelectronics
+  *
+  * Redistribution and use in source and binary forms, with or without modification,
+  * are permitted provided that the following conditions are met:
+  *   1. Redistributions of source code must retain the above copyright notice,
+  *      this list of conditions and the following disclaimer.
+  *   2. Redistributions in binary form must reproduce the above copyright notice,
+  *      this list of conditions and the following disclaimer in the documentation
+  *      and/or other materials provided with the distribution.
+  *   3. Neither the name of STMicroelectronics nor the names of its contributors
+  *      may be used to endorse or promote products derived from this software
+  *      without specific prior written permission.
+  *
+  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  *
+  ******************************************************************************
+  */
 
 #include "stdlib.h"
 #include "string.h"
@@ -126,10 +146,6 @@ bool lcdCommand(LCDCommands command, LCDParamsActions action) {
                     lcdParams.modeBits |= LCD_BIT_CURSOR_ON;
                     break;
 
-                case LCD_CURSOR_BLINK:
-                    lcdParams.modeBits |= LCD_BIT_BLINK_ON;
-                    break;
-
                 case LCD_CLEAR:
                     lcdData = LCD_BIT_DISP_CLEAR;
 
@@ -152,18 +168,6 @@ bool lcdCommand(LCDCommands command, LCDParamsActions action) {
                         return true;
                     }
 
-                case LCD_CURSOR_DIR_RIGHT:
-                    lcdParams.entryBits |= LCD_BIT_CURSOR_DIR_RIGHT;
-                    break;
-
-                case LCD_CURSOR_DIR_LEFT:
-                    lcdParams.entryBits |= LCD_BIT_CURSOR_DIR_LEFT;
-                    break;
-
-                case LCD_DISPLAY_SHIFT:
-                    lcdParams.entryBits |= LCD_BIT_DISPLAY_SHIFT;
-                    break;
-
                 default:
                     return false;
             }
@@ -178,22 +182,6 @@ bool lcdCommand(LCDCommands command, LCDParamsActions action) {
 
                 case LCD_CURSOR:
                     lcdParams.modeBits &= ~LCD_BIT_CURSOR_ON;
-                    break;
-
-                case LCD_CURSOR_BLINK:
-                    lcdParams.modeBits &= ~LCD_BIT_BLINK_ON;
-                    break;
-
-                case LCD_CURSOR_DIR_RIGHT:
-                    lcdParams.entryBits &= ~LCD_BIT_CURSOR_DIR_RIGHT;
-                    break;
-
-                case LCD_CURSOR_DIR_LEFT:
-                    lcdParams.entryBits &= ~LCD_BIT_CURSOR_DIR_LEFT;
-                    break;
-
-                case LCD_DISPLAY_SHIFT:
-                    lcdParams.entryBits &= ~LCD_BIT_DISPLAY_SHIFT;
                     break;
 
                 default:
@@ -212,12 +200,6 @@ bool lcdCommand(LCDCommands command, LCDParamsActions action) {
         case LCD_CURSOR:
         case LCD_CURSOR_BLINK:
             lcdData = LCD_BIT_DISPLAY_CONTROL | lcdParams.modeBits;
-            break;
-
-        case LCD_CURSOR_DIR_RIGHT:
-        case LCD_CURSOR_DIR_LEFT:
-        case LCD_DISPLAY_SHIFT:
-            lcdData = LCD_BIT_ENTRY_MODE | lcdParams.entryBits;
             break;
 
         default:
